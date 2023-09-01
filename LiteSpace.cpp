@@ -1,7 +1,8 @@
 /*
+ * Recursive solution to problem; runtime too long
  * Lite Space: Problem from kattis.com
  * Joshua Cappella
- * 08/31/2023
+ * 08/29/2023
  */
 
 using namespace std;
@@ -52,135 +53,146 @@ string trim(string input){
     return input;
 }
 
+// converts input to operations
+int decode(string i, stack<int> s){
+
+    // stack<int> s;
+
+    // push integer onto stack
+    if(i.substr(0,2) == "SS"){
+        i = i.substr(2);
+        int j = 0;
+        if(i.substr(0,1) == "S"){
+            j = getBinary(i);
+        }
+        else{
+            j = (-1 * getBinary(i));
+        }
+        s.push(j);
+        i = trim(i);
+        //cout << i << endl;
+        decode(i,s);
+    }
+    // push copy of stack top onto top of stack
+    else if(i.substr(0,3) == "SNS"){
+        i = i.substr(3);
+        if(s.empty()){
+            cout << "Invalid copy operation\n";
+            decode(i,s);
+        }
+        s.push(s.top());
+        decode(i,s);
+    }
+    // swap two top stack elements
+    else if(i.substr(0,3) == "SNT"){
+        i = i.substr(3);
+        if(s.size() < 2){
+            cout << "Invalid swap operation\n";
+            decode(i,s);
+        }
+        int l = s.top();
+        s.pop();
+        int m = s.top();
+        s.pop();
+        s.push(l);
+        s.push(m);
+        decode(i,s);
+    }
+    // remove and discard top stack element
+    else if(i.substr(0,3) == "SNN"){
+        i = i.substr(3);
+        if(s.empty()){
+            cout << "Invalid remove operation\n";
+            decode(i,s);
+        }
+        s.pop();
+        decode(i,s);
+    }
+    // remove top two stack elements and push their sum onto stack
+    else if(i.substr(0,4) == "TSSS"){
+        i = i.substr(4);
+        if(s.size() < 2){
+            cout << "Invalid addition operation\n";
+            decode(i,s);
+        }
+        int l = s.top();
+        s.pop();
+        int m = s.top();
+        s.pop();
+        s.push(l+m);
+        decode(i,s);
+    }
+    // remove top two stack elements and push their difference onto stack
+    else if(i.substr(0,4) == "TSST"){
+        i = i.substr(4);
+        if(s.size() < 2){
+            cout << "Invalid subtraction operation\n";
+            decode(i,s);
+        }
+        int l = s.top();
+        s.pop();
+        int m = s.top();
+        s.pop();
+        s.push(m-l);
+        decode(i,s);
+    }
+    // remove two topmost stack elements and push their product onto stack
+    else if(i.substr(0,4) == "TSSN"){
+        i = i.substr(4);
+        if(s.size() < 2){
+            cout << "Invalid multiplication operation\n";
+            decode(i,s);
+        }
+        int l = s.top();
+        s.pop();
+        int m = s.top();
+        s.pop();
+        s.push(l*m);
+        decode(i,s);
+    }
+    // remove two top stack elements and push their quotient onto the stack
+    else if(i.substr(0,4) == "TSTS"){
+        i = i.substr(4);
+        if(s.size() < 2){
+            cout << "Invalid division operation\n";
+            decode(i,s);
+        }
+        else if(s.top() == 0){
+            cout << "Division by zero\n";
+            decode(i,s);
+        }
+        int l = s.top();
+        s.pop();
+        int m = s.top();
+        s.pop();
+        int n = (m/l);
+        s.push(n);
+        decode(i,s);
+    }
+    // remove the integer on top of stack and print
+    else if(i.substr(0,4) == "TNST"){
+        i = i.substr(4);
+        if(s.empty()){
+            cout << "Invalid print operation\n";
+            decode(i,s);
+        }
+        cout << s.top() << endl;
+        s.pop();
+        decode(i,s);
+    }
+    return 0;
+}
+
 int main(){
     // declarations
-    string i = "";
+    string input = "";
     stack<int> s;
 
-    cin >> i;
+    cin >> input;
 
     //if(input == "S"){cout << "Hello World\n";}
-    // push number on to stack
-    while(i.size() > 0){
-        if(i.substr(0,2) == "SS"){
-            i = i.substr(2);
-            int j = 0;
-            if(i.substr(0,1) == "S"){
-                j = getBinary(i);
-            }
-            else{
-                j = (-1 * getBinary(i));
-            }
-            s.push(j);
-            i = trim(i);
-            //cout << i << endl;
-        }
-        // push copy of stack top onto top of stack
-        else if(i.substr(0,3) == "SNS"){
-            i = i.substr(3);
-            if(!s.empty()){
-                s.push(s.top());
-            }
-            else{
-                cout << "Invalid copy operation\n";
-            }
-        }
-        // swap two top stack elements
-        else if(i.substr(0,3) == "SNT"){
-            i = i.substr(3);
-            if(s.size() > 1){
-                int l = s.top();
-                s.pop();
-                int m = s.top();
-                s.pop();
-                s.push(l);
-                s.push(m);
-            }
-            else{
-                cout << "Invalid swap operation\n";
-            }
-        }
-        // remove and discard top stack element
-        else if(i.substr(0,3) == "SNN"){
-            i = i.substr(3);
-            if(!s.empty()){
-                s.pop();
-            }
-            else{
-                cout << "Invalid remove operation\n";
-            }
-        }
-        // remove top two stack elements and push their sum onto stack
-        else if(i.substr(0,4) == "TSSS"){
-            i = i.substr(4);
-            if(s.size() > 1){
-                int l = s.top();
-                s.pop();
-                int m = s.top();
-                s.pop();
-                s.push(l+m);
-            }
-            else{
-                cout << "Invalid addition operation\n";
-            }
-        }
-        // remove top two stack elements and push their difference onto stack
-        else if(i.substr(0,4) == "TSST"){
-            i = i.substr(4);
-            if(s.size() > 1){
-                int l = s.top();
-                s.pop();
-                int m = s.top();
-                s.pop();
-                s.push(m-l);
-            }
-            else{
-                cout << "Invalid subtraction operation\n";
-            }
-        }
-        // remove two topmost stack elements and push their product onto stack
-        else if(i.substr(0,4) == "TSSN"){
-            i = i.substr(4);
-            if(s.size() > 1){
-                int l = s.top();
-                s.pop();
-                int m = s.top();
-                s.pop();
-                s.push(l*m);
-            }
-            else{
-                cout << "Invalid multiplication operation\n";
-            }
-        }
-        // remove two top stack elements and push their quotient onto the stack
-        else if(i.substr(0,4) == "TSTS"){
-            i = i.substr(4);
-            if(s.size() < 2){
-                cout << "Invalid division operation\n";
-            }
-            else if(s.top() == 0){
-                cout << "Division by zero\n";
-            }
-            else{
-                int l = s.top();
-                s.pop();
-                int m = s.top();
-                s.pop();
-                int n = (m/l);
-                s.push(n);
-            }
-        }
-        // remove the integer on top of stack and print
-        else if(i.substr(0,4) == "TNST"){
-            i = i.substr(4);
-            if(s.empty()){
-                cout << "Invalid print operation\n";
-            }
-            else{
-                cout << s.top() << endl;
-                s.pop();
-            }
-        }
-    }
+
+    decode(input, s);
+
     return 0;
 }
