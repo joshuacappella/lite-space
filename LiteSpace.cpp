@@ -1,7 +1,7 @@
 /*
  * Lite Space: Problem from kattis.com
  * Joshua Cappella
- * 08/31/2023
+ * 09/06/2023
  */
 
 using namespace std;
@@ -13,42 +13,35 @@ using namespace std;
 // get Binary number from front of string converted to base 10
 int getBinary(string ints){
     int j = 0;
-    ints = ints.substr(1);
+    ints = ints.substr(3);
     char c;
     string s = "";
     while(c != 'N'){
         c = ints[0];
-        //cout << c << endl;
         if(c == 'S'){
             s += "0";
         }
         else if(c == 'T'){
             s += "1";
         }
-        //cout << s << endl;
         ints = ints.substr(1);
-        //cout << ints << endl;
     }
-    ints = ints.substr(1);
     for(int k = 0; s.size() > 0; k++){
         if(s[s.size() - 1] == '1'){
-            //cout << k << endl;
             j += pow(2,k);
         }
-        //cout << j << endl;
-        //cout << s << endl;
         s = s.substr(0, (s.size() - 1));
     }
-    //cout << j << endl;
     return j;
 }
 
 // removes numerical characters
 string trim(string input){
-    while(input[0] != 'N'){
-        input = input.substr(1);
+    int i = 0;
+    while(input[i] != 'N'){
+        i++;
     }
-    input = input.substr(1);
+    input = input.substr(i + 1);
     return input;
 }
 
@@ -59,13 +52,11 @@ int main(){
 
     cin >> i;
 
-    //if(input == "S"){cout << "Hello World\n";}
-    // push number on to stack
     while(i.size() > 0){
+        // push number on to stack
         if(i.substr(0,2) == "SS"){
-            i = i.substr(2);
             int j = 0;
-            if(i.substr(0,1) == "S"){
+            if(i.substr(2,1) == "S"){
                 j = getBinary(i);
             }
             else{
@@ -73,7 +64,6 @@ int main(){
             }
             s.push(j);
             i = trim(i);
-            //cout << i << endl;
         }
         // push copy of stack top onto top of stack
         else if(i.substr(0,3) == "SNS"){
